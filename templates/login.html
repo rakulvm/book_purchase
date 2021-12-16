@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+</head>
+<style>
+    body{
+    background-image: url('https://images.pexels.com/photos/3822681/pexels-photo-3822681.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500');
+    background-size: cover;
+    }
+</style>
+<body>
+<form method="post" action="login">
+    {% csrf_token %}
+    <label for="user">Username:</label>
+    <input type="text" name="username" placeholder="Username"></input>
+    <label for="password">Password:</label>
+    <input type="password" name="password" placeholder="Password"></input>
+    <button type="submit">Submit</button>
+  </form>
+</body>
+</html>
