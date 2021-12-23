@@ -5,6 +5,7 @@
     <title>Index</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
 </head>
 <style>
     .card-img-top{
@@ -66,14 +67,23 @@
           </ul>
         </li>
         </ul>
+          <ul class="navbar-nav ms-auto">
         <form class="form-inline my-2 my-lg-0" action="/search">
-          <input class="form-control mr-sm-2" type="search" name="book_name" placeholder="Search" aria-label="Search">
+            <div class="input-group">
+          <input class="form-control rounded" type="search" name="book_name" placeholder="Search" aria-label="Search">
           <button class="btn btn-success my-2 my-sm-0" type="submit">Search</button>
         </form>
-          <ul class="navbar-nav ms-auto">
-            <li class="nav-item" >
-                <a class="nav-link" href="/login"><button type="button" class="btn btn-danger">Logout</button></a>
+              <form class="form-inline my-2 my-lg-0" action="cart">
+                    {% csrf_token %}
+                    <li class="nav-item active">
+                        <button type="button" id="popcart" class="btn btn-secondary" data-html="true" data-toggle="tooltip" data-placement="left" title="Cart items">
+                          <i class="bi bi-cart3">(<span id="cart">0</span>)</i></button>
+                    </li>
+                </form>
+              <li class="nav-item" >
+                <a class="nav-link" href="/login"><button type="button" class="btn btn-danger"><i class="bi bi-power"></i></button></a>
           </li>
+        </div>
         </ul>
       </div>
     </nav>
@@ -86,15 +96,17 @@
                       <img class="card-img-top" src="media/{{book.image}}" alt="Card image cap">
                   </div>
                   <div class="card-body">
-                    <h5 class="card-title">{{book.name}}</h5>
+                    <h5 class="card-title" id="namepr{{book.id}}">{{book.name}}</h5>
                     <p class="card-text">
-                        Price: ₹{{book.price}}<br>
+                        <h6 class="card-text" id="pricepr{{book.id}}">Price: ₹{{book.price}}</h6><br>
                         Quantity: {{book.quantity}}<br>
                         Category: {{book.category}}
                     </p>
                       {% if book.quantity > 0 %}
                         <p class="text-success">In stock</p>
-                        <a href="#" class="btn btn-primary">Buy now</a>
+                        <span id="divpr{{book.id}}" class="divpr">
+                            <button id="pr{{book.id}}" class="btn btn-dark cart">Add to Cart</button>
+                        </span>
                       {% else %}
                         <p class="text-danger">Out of stock</p>
                         <a href="#" class="btn btn-secondary" disabled>Buy now</a>
@@ -110,5 +122,103 @@
             <a href="{% url 'index' %}?page={{books.next_page_number}}" class="link1"><button type="button" class="btn btn-success s1"> > </button></a><p class="link1">next</p>
         {% endif %}
     </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"  integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+  crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"  integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut"
+  crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"  integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k"
+  crossorigin="anonymous"></script>
+        {% block js %}
+    <script>
+        console.log('working');
+        if (localStorage.getItem('cart') == null){
+            var cart = {};
+        }
+        else{
+            cart = JSON.parse(localStorage.getItem('cart'));
+<!--            document.getElementById('cart').innerHTML = Object.keys(cart).length;-->
+            updateCart(cart);
+        }
+
+        $('.divpr').on('click', 'button.cart', function(){
+            var idstr = this.id.toString();
+            if (cart[idstr] !=undefined){
+                quantity = cart[idstr][0] + 1;
+            }
+            else{
+                quantity = 1;
+                name=document.getElementById('name'+idstr).innerHTML;
+                price = document.getElementById('price'+idstr).innerHTML.slice(8, );
+                console.log(price);
+                cart[idstr] = [quantity, name, price];
+            }
+            updateCart(cart);
+        });
+
+        $('#popcart').popover();
+        updatePopover(cart);
+        function updatePopover(cart){
+            var popStr = "";
+            popStr = popStr + "<h5> Books in shopping cart</h5>";
+            var i = 1;
+            for (var item in cart){
+                popStr = popStr + "<b>" + i + "</b>. ";
+                popStr = popStr + document.getElementById('name' + item).innerHTML.slice(0,19) + "Quantity: " + cart[item] + '<br>';
+                i=i+1;
+            }
+            popStr = popStr + "<a href='checkout'><button class='btn btn-primary' id='checkout'>Checkout</button></a> <button class='btn btn-primary' onclick='clearCart()' id='clearCart'>Clear cart</button>"
+            console.log(popStr);
+            document.getElementById('popcart').setAttribute('data-content', popStr);
+            $('#popcart').popover('show');
+        }
+
+        function clearCart(){
+            cart = JSON.parse(localStorage.getItem('cart'));
+            for (var item in cart){
+                document.getElementById('div' +item).innerHTML ='<button id="'+ item +'" class="btn btn-dark cart" >Add to Cart</button>'
+            }
+            localStorage.clear();
+            cart = {};
+            updateCart(cart);
+        }
+
+        function updateCart(cart){
+            console.log(cart);
+            var sum=0;
+            for (var item in cart){
+                sum = sum+cart[item][0];
+                document.getElementById('div'+item).innerHTML = "<button id='minus" + item+ "' class='btn btn-primary minus'>-</button> <span id='val" + item + "''>" + cart[item][0]+"</span><button id = 'plus" + item + "' class='btn btn-primary plus'>+</button>";
+            }
+            localStorage.setItem('cart', JSON.stringify(cart));
+            document.getElementById('cart').innerHTML = sum;
+            updatePopover(cart);
+            console.log(cart);
+        }
+
+
+        $('.divpr').on("click", "button.minus", function(){
+            console.log("minus clicked");
+            a = this.id.slice(7, );
+            console.log(a);
+            cart['pr' +a][0] = cart['pr' +a][0] -1;
+            cart['pr'+a][0] = Math.max(0, cart['pr'+a][0]);
+            document.getElementById('valpr'+a).innerHTML = cart['pr'+a][0];
+            updateCart(cart);
+        });
+
+        $('.divpr').on("click", "button.plus", function(){
+            console.log("plus clicked");
+            a = this.id.slice(6, );
+            console.log(a);
+            cart['pr' +a][0] = cart['pr' +a][0] +1;
+            document.getElementById('valpr'+a).innerHTML = cart['pr'+a][0];
+            updateCart(cart);
+
+        });
+
+    </script>
+    {% endblock %}
 </body>
 </html>

@@ -63,3 +63,10 @@ def category(request):
         return render(request, 'search_books.html', {'books':status})
     else:
         return HttpResponse("Book not found!")
+
+def checkout(request):
+    return render(request, 'checkout.html')
+
+def placeorder(request):
+
+    return render(request, 'placeorder.html')
