@@ -24,15 +24,17 @@
     }
 </style>
 <body>
+{% load crispy_forms_tags %}
 <div class="container">
     <form method="post" action="login">
     {% csrf_token %}
         <h2>Welcome to Ledger</h2>
         <h3>Sign in here</h3>
-    <label for="user" class="field">Username:</label>
-    <input type="text" name="username" placeholder="Username"></input><br>
-    <label for="password" class="field">Password:</label>
-    <input type="password" name="password" placeholder="Password"></input><br>
+        {{ form|crispy }}
+<!--    <label for="user" class="field">Username:</label>-->
+<!--    <input type="text" name="username" placeholder="Username"></input><br>-->
+<!--    <label for="password" class="field">Password:</label>-->
+<!--    <input type="password" name="password" placeholder="Password"></input><br>-->
     <button type="submit" class="btn btn-primary">Submit</button>
   </form><br> <a href="/"><button type="submit" class="btn btn-danger">Back</button></a>
 </div>

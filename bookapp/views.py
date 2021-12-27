@@ -1,31 +1,28 @@
 from django.shortcuts import render, redirect
+from django.contrib.auth.hashers import make_password
 from django.http import HttpResponse
 from django.contrib.auth.models import User, auth
-from .models import book_table, book_details
-from django.contrib.auth.hashers import make_password
+from .models import register_user, book_details
+from .forms import register_form, login_form
 from django.core.paginator import Paginator, EmptyPage
 
 def home(request):
     return render(request, "home.html")
 
 def register(request):
-    if request.method=='POST':
-        name=request.POST['name']
-        username=request.POST['username']
-        password = request.POST['password']
-        cpassword = request.POST['cpassword']
-        db_list = book_table.objects.all()
-        for db1 in db_list:
-            if db1.username == username:
-                return HttpResponse("Username not available! Enter another username..")
-        if password == cpassword:
-            booktable = book_table(name=name, username=username, password=password)
-            booktable.save()
-            flag=True
+    ''' Get details from register page and save in user_details '''
+    form = register_form(request.POST or None)
+    if request.method == 'POST':
+        if form.is_valid():
+            name = request.POST['name']
+            username = request.POST['username']
+            password = request.POST['password']
+            repassword = request.POST['repassword']
+            pwd = make_password(password)
+            save_user = register_user(name=name, username=username, password=pwd)
+            save_user.save()
             return render(request, 'login.html')
-        else:
-            return HttpResponse("Passwords does not match")
-    return render(request, 'register.html')
+    return render(request, 'register.html', {'form': form})
 
 def index(request):
     books = book_details.objects.all().order_by('name')
@@ -38,15 +35,11 @@ def index(request):
     return render(request, 'index.html', {'books': page})
 
 def login(request):
-    username = request.POST.get('username')
-    password = request.POST.get('password')
-    db_list = book_table.objects.all()
-    for db in db_list:
-        print(db.username)
-        if db.username == username and db.password == password:
+    form = login_form(request.POST or None)
+    if request.method == 'POST':
+        if form.is_valid():
             return redirect('index')
-
-    return render(request, 'login.html')
+    return render(request, 'login.html', {'form': form})
 
 def search(request):
     book_name = request.GET.get('book_name')
@@ -68,5 +61,4 @@ def checkout(request):
     return render(request, 'checkout.html')
 
 def placeorder(request):
-
     return render(request, 'placeorder.html')

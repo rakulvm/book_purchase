@@ -1,10 +1,10 @@
 from django.db import models
 
 # Create your models here.
-class book_table(models.Model):
+class register_user(models.Model):
     name = models.CharField(max_length=100)
     username = models.CharField(max_length=100, primary_key=True)
-    password = models.CharField(max_length=20)
+    password = models.CharField(max_length=1000)
 
 class book_details(models.Model):
     name = models.CharField(max_length=100)

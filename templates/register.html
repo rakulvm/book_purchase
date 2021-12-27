@@ -29,19 +29,22 @@
    }
 </style>
 <body>
+{% load crispy_forms_tags %}
 <div class="container">
     <form method="post" action="register">
     {% csrf_token %}
     <h2>Welcome to Ledger</h2>
       <h3>Register here</h3>
-    <label for="name" class="field">Name:</label>
-    <input type="text" name="name" placeholder="Name"></input><br>
-    <label for="user" class="field">Username:</label>
-    <input type="text" name="username" placeholder="Username"></input><br>
-    <label for="password" class="field">Password:</label>
-    <input type="password" name="password" placeholder="Password"></input><br>
-    <label for="confirm password" class="field">Confirm Password:</label>
-    <input type="password" name="cpassword" placeholder="Confirm Password"></input><br>
+        {{ form|crispy }}
+<!--    <label for="name" class="field">Name:</label>-->
+<!--    <input type="text" name="name" placeholder="Name"></input><br>-->
+<!--    <label for="user" class="field">Username:</label>-->
+<!--    <input type="text" name="username" placeholder="Username"></input><br>-->
+<!--    <label for="password" class="field">Password:</label>-->
+<!--    <input type="password" name="password" placeholder="Password"></input><br>-->
+<!--    <label for="confirm password" class="field">Confirm Password:</label>-->
+<!--    <input type="password" name="cpassword" placeholder="Confirm Password"></input><br>-->
+
     <button type="submit" class="btn btn-primary">Submit</button>
   </form><br>
   <a href="/"><button type="submit" class="btn btn-danger">Back</button></a>
